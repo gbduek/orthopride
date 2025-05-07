@@ -14,14 +14,14 @@ const CalendarSchedule = () => {
 		setEvents([
 			{
 				id: "1",
-				title: "Consulta - João",
+				title: "Confirmado - João",
 				start: "2025-04-25T10:00:00",
 				end: "2025-04-25T11:00:00",
 				color: "#4caf50", // Confirmado
 			},
 			{
 				id: "2",
-				title: "Avaliação - Maria",
+				title: "Pendente - Maria",
 				start: "2025-04-26T14:00:00",
 				color: "#ffc107", // Pendente
 			},
@@ -35,8 +35,9 @@ const CalendarSchedule = () => {
 	}, []);
 
 	return (
-		<div>
+		<div style={{ width: "1200px" }}>
 			<FullCalendar
+				height={600}
 				locale={ptBrLocale}
 				plugins={[
 					dayGridPlugin,

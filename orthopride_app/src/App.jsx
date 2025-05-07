@@ -2,10 +2,12 @@ import { Routes, Route } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import Login from "./screens/login.jsx";
 import Layout from "./screens/layout.jsx";
-import Dashboard from "./screens/dashboard/dashboard.jsx";
+import Dashboard from "./screens/Dashboard/Dashboard.jsx";
 import Agendamentos from "./screens/Agendamentos.jsx";
-import Financeiro from "./screens/Financeiro.jsx";
+import Financeiro from "./screens/Financeiro/Financeiro.jsx";
 import Mensageria from "./screens/Mensageria.jsx";
+import Campanhas from "./screens/Campanhas/Campanhas.jsx";
+import ConfigScreen from "./screens/ConfigScreen/ConfigScreen.jsx";
 
 // Font imports
 import "@fontsource/poppins/100.css"; // Thin
@@ -29,6 +31,8 @@ function App() {
 					<Route path="/agendamentos" element={<Agendamentos />} />
 					<Route path="/financeiro" element={<Financeiro />} />
 					<Route path="/mensageria" element={<Mensageria />} />
+					<Route path="/campanhas" element={<Campanhas />} />
+					<Route path="/configscreen" element={<ConfigScreen />} />
 				</Route>
 			) : (
 				<Route path="*" element={<Login />} />

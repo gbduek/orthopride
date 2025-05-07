@@ -28,9 +28,10 @@ const Dashboard = () => {
 			{/*The mother grid*/}
 			<Grid
 				container
-				spacing={2}
+				spacing={4}
 				direction={"column"}
 				justifySelf={"center"}
+				marginTop={4}
 			>
 				<Grid1 th={theme} />
 				<Grid2 th={theme} />

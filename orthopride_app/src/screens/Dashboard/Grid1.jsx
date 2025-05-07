@@ -1,6 +1,8 @@
 import { Grid, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
+import { motion } from "framer-motion";
+import { cardHoverAnimation } from "../../components/Animations";
 
 const Item = styled(Paper)(({ theme }) => ({
 	padding: theme.spacing(2),
@@ -11,7 +13,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Grid1 = ({ th }) => (
-	<Grid container direction="row" spacing={10}>
+	<Grid container direction="row" spacing={10} justifyContent={"center"}>
 		{[
 			{
 				label: "Total de Pacientes",
@@ -34,27 +36,29 @@ const Grid1 = ({ th }) => (
 				sub: "+5% vs. mês anterior",
 			},
 		].map((kpi, index) => (
-			<Grid item xs={12} sm={6} md={3} key={index}>
-				<Item
-					sx={{
-						borderTop: "8px solid",
-						borderImage: `${th.custom.gradientMain} 1`,
-						width: "250px",
-						height: "150px",
-						padding: "20px",
-					}}
-				>
-					<Typography variant="subtitle2" color="text.secondary">
-						{kpi.label}
-					</Typography>
-					<Typography variant="h6" fontWeight="bold">
-						{kpi.value}
-					</Typography>
-					<Typography variant="caption" color="success.main">
-						{kpi.sub}
-					</Typography>
-				</Item>
-			</Grid>
+			<motion.div whileHover={cardHoverAnimation}>
+				<Grid item xs={12} sm={6} md={3} key={index}>
+					<Item
+						sx={{
+							borderTop: "8px solid",
+							borderImage: `${th.custom.gradientMain} 1`,
+							width: "300px",
+							height: "150px",
+							padding: "20px",
+						}}
+					>
+						<Typography variant="h6" color="text.secondary">
+							{kpi.label}
+						</Typography>
+						<Typography variant="h6" fontWeight="bold">
+							{kpi.value}
+						</Typography>
+						<Typography variant="caption" color="success.main">
+							{kpi.sub}
+						</Typography>
+					</Item>
+				</Grid>
+			</motion.div>
 		))}
 	</Grid>
 );

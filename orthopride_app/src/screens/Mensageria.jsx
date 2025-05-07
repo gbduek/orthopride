@@ -12,6 +12,7 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { styled } from "@mui/system";
+import MessageModal from "../components/Modals/MessageModal";
 
 const platforms = [
 	{
@@ -91,6 +92,10 @@ const Mensageria = () => {
 				minHeight: "100vh",
 			}}
 		>
+			{openModal ? (
+				<MessageModal isOpen={true} onClose={handleCloseModal} />
+			) : null}
+
 			<Typography
 				fontFamily={"poppins"}
 				variant="h2"
@@ -142,31 +147,18 @@ const Mensageria = () => {
 										</li>
 									))}
 								</ul>
-								{platform.title === "Instagram" ? (
-									<StyledButton
-										variant="contained"
-										sx={{
-											mt: 2,
-											backgroundColor:
-												"rgba(255, 255, 255, 0.7)",
-											fontFamily: "Poppins",
-										}}
-									>
-										Acessar
-									</StyledButton>
-								) : (
-									<StyledButton
-										variant="contained"
-										sx={{
-											mt: 2,
-											backgroundColor:
-												"rgba(255, 255, 255, 0.7)",
-											fontFamily: "Poppins",
-										}}
-									>
-										Acessar
-									</StyledButton>
-								)}
+								<StyledButton
+									variant="contained"
+									sx={{
+										mt: 2,
+										backgroundColor:
+											"rgba(255, 255, 255, 0.7)",
+										fontFamily: "Poppins",
+									}}
+									onClick={handleOpenModal}
+								>
+									Acessar
+								</StyledButton>
 							</CardContent>
 						</StyledCard>
 					</Grid>

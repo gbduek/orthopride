@@ -19,9 +19,15 @@ const Grid4 = ({ th }) => (
 				width: 700,
 			}}
 		>
-			<Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+			<Typography variant="h5" fontWeight="bold" gutterBottom>
 				Atividades Recentes
 			</Typography>
+			<Divider />
+			<Grid container direction={"row"} justifyContent={"space-around"}>
+				<Typography fontWeight="bold">Atividade</Typography>
+				<Typography fontWeight="bold">Usuário</Typography>
+				<Typography fontWeight="bold">Data/Hora</Typography>
+			</Grid>
 			<Divider />
 			{[
 				["Consulta agendada", "Recepção", "Hoje, 14:32"],
@@ -33,7 +39,7 @@ const Grid4 = ({ th }) => (
 				<Box
 					key={idx}
 					display="flex"
-					justifyContent="space-between"
+					justifyContent="space-around"
 					py={1}
 				>
 					<Typography variant="body2">{atividade}</Typography>

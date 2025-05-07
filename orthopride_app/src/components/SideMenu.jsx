@@ -152,7 +152,7 @@ const SideMenu = () => {
 						{
 							text: "Campanhas",
 							icon: <ListAltIcon sx={{ color: "white" }} />,
-							link: "/tasks",
+							link: "/campanhas",
 						},
 						{
 							text: "Mensageria",
@@ -168,7 +168,7 @@ const SideMenu = () => {
 						{
 							text: "Configurações",
 							icon: <SettingsIcon sx={{ color: "white" }} />,
-							link: "/reports",
+							link: "/configscreen",
 						},
 						{
 							text: "Logout",

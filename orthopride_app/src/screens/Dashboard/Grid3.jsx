@@ -19,7 +19,7 @@ const Grid3 = ({ th }) => (
 				width: 700,
 			}}
 		>
-			<Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+			<Typography variant="h5" fontWeight="bold" gutterBottom>
 				Campanhas Ativas
 			</Typography>
 			<Divider />
@@ -28,26 +28,39 @@ const Grid3 = ({ th }) => (
 				"Lembrete de Consultas",
 				"Cobrança de Atrasos",
 			].map((camp, i) => (
-				<Box key={i} py={1}>
-					<Typography variant="body2" fontWeight="bold">
-						{camp}
-					</Typography>
-					<Typography variant="caption" color="text.secondary">
-						{i === 0 ? "Termina em 5 dias" : "Campanha contínua"}
-					</Typography>
-					<Stack direction="row" spacing={2} mt={0.5}>
-						<Typography variant="caption">
-							{[245, 1248, 87][i]} Envios
+				<Item
+					sx={{
+						borderImage: `${th.custom.gradientMain} 2`,
+						borderRadius: 2,
+						marginTop: 1,
+					}}
+				>
+					<Box key={i} py={3} padding={1}>
+						<Typography variant="body1" fontWeight="bold">
+							{camp}
 						</Typography>
 						<Typography variant="caption" color="text.secondary">
 							{i === 0
-								? "32% Conversão"
-								: i === 1
-								? "78% Confirmações"
-								: "45% Pagamentos"}
+								? "Termina em 5 dias"
+								: "Campanha contínua"}
 						</Typography>
-					</Stack>
-				</Box>
+						<Stack direction="row" spacing={2} mt={0.5}>
+							<Typography variant="caption">
+								{[245, 1248, 87][i]} Envios
+							</Typography>
+							<Typography
+								variant="caption"
+								color="text.secondary"
+							>
+								{i === 0
+									? "32% Conversão"
+									: i === 1
+									? "78% Confirmações"
+									: "45% Pagamentos"}
+							</Typography>
+						</Stack>
+					</Box>
+				</Item>
 			))}
 		</Item>
 	</Grid>
