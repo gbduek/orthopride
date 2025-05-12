@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import DiscadorMSG from "../../services/DiscadorMSG";
 import { Modal, Box, Typography, Button } from "@mui/material";
 
 const style = {
@@ -14,32 +14,9 @@ const style = {
 	p: 4,
 };
 
-const sendMessage = async () => {
-	try {
-		const response = await axios.post(
-			"https://discadorapi.zenn.digital/api/messages/send",
-			{
-				number: "5599999999999",
-				body: "Sua mensagem",
-			},
-			{
-				headers: {
-					Authorization: "Bearer SEU_TOKEN_AQUI",
-					"Content-Type": "application/json",
-				},
-			}
-		);
-
-		console.log("Mensagem enviada:", response.data);
-	} catch (error) {
-		console.error(
-			"Erro ao enviar mensagem:",
-			error.response?.data || error.message
-		);
-	}
-};
-
 const MessageModal = ({ isOpen = false, onClose }) => {
+	const token =
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2FybmFtZSI6IkFkbWluIiwicHJvZmlsZSI6ImFkbWluIiwiaWQiOjEsImNvbXBhbnlJZCI6MSwiaWF0IjoxNzQ3MDU1OTk1LCJleHAiOjE3NDcwNTY4OTV9.dImLfD1B-RnRcT3_HuBcpLPLUPnqynDt_WZ_rwwtB2o";
 	return (
 		<div>
 			<Modal open={isOpen} onClose={onClose}>
@@ -50,7 +27,11 @@ const MessageModal = ({ isOpen = false, onClose }) => {
 					<Typography sx={{ mt: 2 }}>
 						Some content goes here.
 					</Typography>
-					<Button onClick={sendMessage}>
+					<Button
+						onClick={() =>
+							DiscadorMSG("552195289559", "Testando Mask", token)
+						}
+					>
 						<Typography sx={{ mt: 2 }}>Send Message</Typography>
 					</Button>
 				</Box>

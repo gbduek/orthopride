@@ -3,6 +3,8 @@ const { execFile } = require("child_process");
 const path = require("path");
 const cors = require("cors");
 
+const pool = require("../db");
+
 const app = express();
 const PORT = 3001;
 
@@ -31,6 +33,16 @@ app.get("/pix", (req, res) => {
 			res.status(500).json({ error: "Resposta inválida do PHP" });
 		}
 	});
+});
+
+//Endpoint para conectar com a DataBase PostgreSQL
+app.get("/dbtest", async (req, res) => {
+	try {
+		const result = await pool.query("SELECT NOW()");
+		res.json(result.rows[0]);
+	} catch (err) {
+		res.status(500).send(err.message);
+	}
 });
 
 // Inicia o servidor

@@ -13,7 +13,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Grid1 = ({ th }) => (
-	<Grid container direction="row" spacing={10} justifyContent={"center"}>
+	<Grid container direction="row" spacing={8} justifyContent={"center"}>
 		{[
 			{
 				label: "Total de Pacientes",

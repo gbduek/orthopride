@@ -60,7 +60,7 @@ const PaymentModal = ({ isOpen = false, onClose }) => {
 		<Modal open={isOpen} onClose={handleClose}>
 			<Box sx={style}>
 				<FormControl fullWidth margin="normal">
-					<FormLabel>Nome do Paciente</FormLabel>
+					<FormLabel>Nome do Cliente</FormLabel>
 					<Input
 						value={patientName}
 						onChange={(e) => setPatientName(e.target.value)}

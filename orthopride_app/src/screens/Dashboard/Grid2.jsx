@@ -19,7 +19,7 @@ const Grid2 = ({ th }) => (
 		xs={12}
 		md={6}
 		direction="row"
-		spacing={5}
+		spacing={2}
 		justifyContent={"center"}
 	>
 		<motion.div whileHover={cardHoverAnimation}>
