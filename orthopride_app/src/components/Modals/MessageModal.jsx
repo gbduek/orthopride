@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import DiscadorMSG from "../../services/DiscadorMSG";
 import { Modal, Box, Typography, Button } from "@mui/material";
 
@@ -29,7 +28,7 @@ const MessageModal = ({ isOpen = false, onClose }) => {
 					</Typography>
 					<Button
 						onClick={() =>
-							DiscadorMSG("552195289559", "Testando Mask", token)
+							DiscadorMSG("552195289586", "Testando Mask", token)
 						}
 					>
 						<Typography sx={{ mt: 2 }}>Send Message</Typography>

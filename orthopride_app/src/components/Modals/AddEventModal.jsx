@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
 	Modal,
 	Box,
-	Typography,
 	Input,
 	Button,
 	FormControl,
@@ -16,6 +15,7 @@ import {
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import PostEvent from "../../services/PostEvent";
 
 const style = {
 	position: "absolute",
@@ -31,29 +31,39 @@ const style = {
 
 const AddEventModal = ({ isOpen = false, onClose }) => {
 	const [patientName, setPatientName] = useState("");
-	const [eventType, setEventType] = useState("consulta");
+	const [professional, setProfessional] = useState("");
+	const [procedure, setProcedure] = useState("");
+	const [eventType, setEventType] = useState("confirmado");
 	const [eventDate, setEventDate] = useState(dayjs());
 
-	const handleSubmit = () => {
+	const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+	const handleSubmit = async () => {
 		const eventColors = {
-			consulta: "#4caf50",
-			avaliacao: "#ffc107",
+			confirmado: "#4caf50",
+			pendente: "#ffc107",
 			cancelado: "#f44336",
 		};
 
 		const newEvent = {
-			id: Date.now().toString(),
 			title: `${capitalize(eventType)} - ${patientName}`,
-			start: eventDate.format("YYYY-MM-DDTHH:mm:ss"),
+			start_date: eventDate.format("YYYY-MM-DD"),
 			color: eventColors[eventType],
+			professional,
+			procedure,
+			event_type: eventType,
+			company_id: 1,
 		};
 
-		console.log("Novo Evento:", newEvent);
-		onClose(); // Fecha o modal
-		// Você pode passar esse evento para o calendário principal via props ou contexto
+		try {
+			const created = await PostEvent(newEvent);
+			console.log("Evento criado no backend:", created);
+			onClose();
+		} catch (error) {
+			alert("Erro ao criar evento.");
+			console.error(error);
+		}
 	};
-
-	const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -93,12 +103,11 @@ const AddEventModal = ({ isOpen = false, onClose }) => {
 						</RadioGroup>
 					</FormControl>
 
-					{/* Profissional */}
 					<FormControl fullWidth margin="normal">
 						<FormLabel>Profissional</FormLabel>
 						<Select
-							value={null}
-							// onChange={(e) => setProfessional(e.target.value)}
+							value={professional}
+							onChange={(e) => setProfessional(e.target.value)}
 							displayEmpty
 						>
 							<MenuItem value="">
@@ -110,15 +119,18 @@ const AddEventModal = ({ isOpen = false, onClose }) => {
 						</Select>
 					</FormControl>
 
-					{/* Procedimento */}
 					<FormControl fullWidth margin="normal">
 						<FormLabel>Procedimento</FormLabel>
-						<Select value={null} displayEmpty>
+						<Select
+							value={procedure}
+							onChange={(e) => setProcedure(e.target.value)}
+							displayEmpty
+						>
 							<MenuItem value="">
 								<em>Selecione</em>
 							</MenuItem>
 							<MenuItem value="Limpeza">Limpeza</MenuItem>
-							<MenuItem value="Cirúrgico">Cirúrgico</MenuItem>
+							<MenuItem value="Cirurgico">Cirúrgico</MenuItem>
 							<MenuItem value="Aparelho Dental">
 								Aparelho Dental
 							</MenuItem>

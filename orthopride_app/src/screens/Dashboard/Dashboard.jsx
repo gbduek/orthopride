@@ -1,4 +1,4 @@
-import React from "react";
+import HomeIcon from "@mui/icons-material/Home";
 import { Grid, Typography, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import Grid1 from "./Grid1";
@@ -11,15 +11,29 @@ const Dashboard = () => {
 	return (
 		<Box sx={{ p: 2 }}>
 			<Box>
-				<Typography
-					color={"#00d2ff"}
-					fontFamily={"poppins"}
-					fontWeight={"bold"}
-					variant="h2"
-					gutterBottom
+				<Box
+					sx={{
+						display: "flex",
+						flexDirection: "row",
+					}}
 				>
-					Dashboard
-				</Typography>
+					<HomeIcon
+						sx={{
+							color: "#00d2ff",
+							fontSize: 60,
+							marginRight: 1,
+						}}
+					/>
+					<Typography
+						color={"#00d2ff"}
+						fontFamily={"poppins"}
+						fontWeight={"bold"}
+						variant="h2"
+						gutterBottom
+					>
+						Dashboard
+					</Typography>
+				</Box>
 				<Typography variant="body1" color="text.secondary" gutterBottom>
 					Visão geral do sistema
 				</Typography>

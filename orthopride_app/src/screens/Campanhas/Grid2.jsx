@@ -10,46 +10,40 @@ const Item = styled(Paper)(({ theme }) => ({
 	fontFamily: "Poppins",
 }));
 
-const Grid2 = ({ th }) => (
+const Grid2 = ({ th, camps }) => (
 	<Grid container direction={"row"} spacing={2} justifyContent={"center"}>
-		<Item
-			sx={{
-				borderTop: "8px solid",
-				borderImage: `${th.custom.gradientMain} 1`,
-				width: "500px",
-				height: "150px",
-				padding: "20px",
-			}}
-		>
-			<Typography variant="subtitle2" color="text.secondary">
-				Desempenho de Campanhas
+		{/* Verificação se 'camps' é um array antes de tentar mapear */}
+		{Array.isArray(camps) && camps.length > 0 ? (
+			camps.map((contact, index) => (
+				<Item
+					key={index}
+					sx={{
+						borderTop: "8px solid",
+						borderImage: `${th.custom.gradientMain} 1`,
+						width: "500px",
+						height: "150px",
+						padding: "20px",
+					}}
+				>
+					<Typography variant="subtitle2" color="text.secondary">
+						Campanha {index + 1}
+					</Typography>
+					<Typography variant="h6" fontWeight="bold">
+						{contact.nome}
+					</Typography>
+					<Typography variant="body2" color="text.secondary">
+						Email: {contact.email}
+					</Typography>
+					<Typography variant="body2" color="text.secondary">
+						Telefone: {contact.telefone}
+					</Typography>
+				</Item>
+			))
+		) : (
+			<Typography variant="h6" color="text.secondary">
+				Nenhum contato disponível
 			</Typography>
-			<Typography variant="h6" fontWeight="bold">
-				324
-			</Typography>
-			<Typography variant="caption" color="success.main">
-				wewetw
-			</Typography>
-		</Item>
-		<Item
-			sx={{
-				borderTop: "8px solid",
-				borderImage: `${th.custom.gradientMain} 1`,
-				width: "500px",
-				height: "150px",
-				padding: "20px",
-			}}
-		>
-			<Typography variant="subtitle2" color="text.secondary">
-				Canais de Comunicação
-			</Typography>
-			<Typography variant="h6" fontWeight="bold">
-				324
-			</Typography>
-			<Typography variant="caption" color="success.main">
-				wewetw
-			</Typography>
-		</Item>
+		)}
 	</Grid>
 );
 

@@ -3,13 +3,18 @@ const { execFile } = require("child_process");
 const path = require("path");
 const cors = require("cors");
 
-const pool = require("../db");
+const pool = require("./db");
+const eventsRoutes = require("./services/events");
+const { validateUser } = require("./services/auth");
+const campaignsRouter = require("./services/campaign");
+const cadastraPixRouter = require("./services/cadastraPix");
 
 const app = express();
 const PORT = 3001;
 
 // Permite requisições da aplicação React (CORS)
 app.use(cors());
+app.use(express.json()); // necessário para ler JSON no corpo da requisição
 
 //Endpoint para gerar link e QR Code de pix
 app.get("/pix", (req, res) => {
@@ -44,6 +49,31 @@ app.get("/dbtest", async (req, res) => {
 		res.status(500).send(err.message);
 	}
 });
+
+//Authentication for Login
+app.post("/login", async (req, res) => {
+	const { email, password } = req.body;
+
+	try {
+		const user = await validateUser(email, password);
+		if (user) {
+			res.status(200).json({ message: "Login successful", user });
+		} else {
+			res.status(401).json({ message: "Invalid credentials" });
+		}
+	} catch (err) {
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
+//Event Handler (agendamentos)
+app.use("/events", eventsRoutes);
+
+//Campaign CSV handler
+app.use("/campaigns", campaignsRouter);
+
+//Cadastra Pix novo
+app.use("/cadastraPix", cadastraPixRouter);
 
 // Inicia o servidor
 app.listen(PORT, () => {

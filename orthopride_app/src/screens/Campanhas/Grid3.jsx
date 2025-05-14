@@ -1,6 +1,15 @@
-import { Grid, Typography, Box, Divider, Chip } from "@mui/material";
+import {
+	Grid,
+	Typography,
+	Box,
+	Divider,
+	Chip,
+	Button,
+	Input,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
+import CampaignPost from "../../services/CampaignPost";
 
 const Item = styled(Paper)(({ theme }) => ({
 	padding: theme.spacing(2),
@@ -9,6 +18,21 @@ const Item = styled(Paper)(({ theme }) => ({
 	boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
 	fontFamily: "Poppins",
 }));
+
+const handleFileUpload = async (e) => {
+	const file = e.target.files[0];
+
+	if (!file) return;
+
+	const formData = new FormData();
+	formData.append("file", file);
+
+	try {
+		await CampaignPost(formData);
+	} catch (error) {
+		console.error("Erro ao enviar arquivo:", error);
+	}
+};
 
 const Grid3 = ({ th }) => (
 	<Grid
@@ -29,46 +53,31 @@ const Grid3 = ({ th }) => (
 				}}
 			>
 				<Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-					Campanhas Ativas
+					Criar Campanha
 				</Typography>
+
 				<Divider />
-				<Grid
-					container
-					direction={"row"}
-					justifyContent={"space-between"}
+
+				<Button
+					variant="contained"
+					component="label"
+					sx={{
+						mb: 2,
+						transition: "0.3s",
+						"&:hover": {
+							backgroundColor: "#316dbf",
+						},
+						backgroundColor: "#3a7bd5",
+					}}
 				>
-					<Typography>Nome</Typography>
-					<Typography>Tipo</Typography>
-					<Typography>Início</Typography>
-					<Typography>Término</Typography>
-				</Grid>
-				<Divider />
-				{[
-					["Maria Santos", "17/04/2025", "08:00", "Confirmado"],
-					["João Oliveira", "17/04/2025", "10:30", "Pendente"],
-					["Ana Pereira", "17/04/2025", "11:45", "Confirmado"],
-					["Carlos Souza", "17/04/2025", "14:15", "Confirmado"],
-					["Pedro Alves", "18/04/2025", "09:00", "Confirmado"],
-				].map(([paciente, data, hora, status], idx) => (
-					<Box
-						key={idx}
-						display="flex"
-						justifyContent="space-between"
-						alignItems="center"
-						py={1}
-					>
-						<Typography variant="body2">{paciente}</Typography>
-						<Typography variant="body2">{data}</Typography>
-						<Typography variant="body2">{hora}</Typography>
-						<Chip
-							size="small"
-							label={status}
-							color={
-								status === "Pendente" ? "warning" : "success"
-							}
-						/>
-					</Box>
-				))}
+					Importar Planilha
+					<Input
+						type="file"
+						accept=".csv"
+						onChange={handleFileUpload}
+						sx={{ display: "none" }}
+					/>
+				</Button>
 			</Item>
 		</Grid>
 	</Grid>

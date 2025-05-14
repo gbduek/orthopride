@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import UsersList from "./UsersList";
+import NewPixService from "../../services/NewPixService";
 
 const keyTypes = [
 	{ value: "cpf", label: "CPF" },
@@ -29,18 +30,26 @@ const ConfigScreen = () => {
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState(false);
 
-	const handlePixSubmit = (e) => {
+	const handlePixSubmit = async (e) => {
 		e.preventDefault();
+
+		const body = {
+			pix: pixKey,
+		};
+
+		try {
+			const created = await NewPixService(body);
+			console.log("Evento criado no backend:", created);
+		} catch (error) {
+			alert("Erro ao criar evento.");
+			console.error(error);
+		}
 
 		if (pixKey.trim() === "") {
 			setError(true);
 			setMessage("A chave PIX não pode estar vazia.");
 			return;
 		}
-
-		setError(false);
-		setMessage("Chave PIX cadastrada com sucesso!");
-		console.log("Chave PIX enviada:", { keyType, pixKey });
 	};
 
 	return (
