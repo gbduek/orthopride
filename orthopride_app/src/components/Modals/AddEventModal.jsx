@@ -36,8 +36,6 @@ const AddEventModal = ({ isOpen = false, onClose }) => {
 	const [eventType, setEventType] = useState("confirmado");
 	const [eventDate, setEventDate] = useState(dayjs());
 
-	const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
 	const handleSubmit = async () => {
 		const eventColors = {
 			confirmado: "#4caf50",
@@ -46,7 +44,7 @@ const AddEventModal = ({ isOpen = false, onClose }) => {
 		};
 
 		const newEvent = {
-			title: `${capitalize(eventType)} - ${patientName}`,
+			title: `${patientName}`,
 			start_date: eventDate.format("YYYY-MM-DD"),
 			color: eventColors[eventType],
 			professional,

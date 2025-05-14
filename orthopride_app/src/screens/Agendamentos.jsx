@@ -1,19 +1,12 @@
-import React, { useState } from "react";
-import {
-	Button,
-	TextField,
-	Typography,
-	Paper,
-	Grid,
-	Slide,
-	Box,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Button, TextField, Typography, Paper, Grid, Box } from "@mui/material";
 import { Add, FilterList } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CalendarSchedule from "../components/CalendarSchedule";
 import AddEventModal from "../components/Modals/AddEventModal";
+import GetEvent from "../services/GetEvent";
 
 const Agendamentos = () => {
 	const [events, setEvents] = useState([]);
@@ -49,6 +42,19 @@ const Agendamentos = () => {
 
 		setFilteredEvents(filtered);
 	};
+
+	useEffect(() => {
+		const fetchEvents = async () => {
+			try {
+				const response = await GetEvent(1); // company_id = 1
+				setEvents(response.events); // assuming GetEvents returns the data directly
+			} catch (error) {
+				console.error("Erro ao carregar eventos:", error);
+			}
+		};
+
+		fetchEvents();
+	}, []);
 
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -154,7 +160,7 @@ const Agendamentos = () => {
 								padding: 2,
 							}}
 						>
-							<CalendarSchedule />
+							<CalendarSchedule events={events} />
 						</Paper>
 					</Grid>
 				</Grid>
@@ -163,8 +169,5 @@ const Agendamentos = () => {
 		</LocalizationProvider>
 	);
 };
-
-// Slide transition for dialog
-const SlideTransition = (props) => <Slide direction="up" {...props} />;
 
 export default Agendamentos;

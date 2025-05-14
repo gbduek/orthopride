@@ -2,15 +2,19 @@ const express = require("express");
 const { execFile } = require("child_process");
 const path = require("path");
 const cors = require("cors");
+const http = require("http");
 
 const pool = require("./db");
 const eventsRoutes = require("./services/events");
 const { validateUser } = require("./services/auth");
 const campaignsRouter = require("./services/campaign");
 const cadastraPixRouter = require("./services/cadastraPix");
+const whatsappRoutes = require("./services/whatsapp");
+const { initWhatsapp } = require("./APIs/whatsapp/wpp-client");
 
 const app = express();
 const PORT = 3001;
+const server = http.createServer(app); // Create HTTP server explicitly
 
 // Permite requisições da aplicação React (CORS)
 app.use(cors());
@@ -75,7 +79,11 @@ app.use("/campaigns", campaignsRouter);
 //Cadastra Pix novo
 app.use("/cadastraPix", cadastraPixRouter);
 
+//whatsapp-web.js
+initWhatsapp(server); // Pass explicit server to whatsapp-web.js socket handler
+app.use("/whatsapp", whatsappRoutes);
+
 // Inicia o servidor
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 	console.log(`Servidor Node.js rodando em http://localhost:${PORT}`);
 });
