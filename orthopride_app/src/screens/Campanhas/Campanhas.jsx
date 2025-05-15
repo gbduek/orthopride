@@ -53,8 +53,10 @@ const Campanhas = () => {
 				marginTop={4}
 			>
 				<Grid1 th={theme} />
-				<Grid2 th={theme} camps={campaigns} />
-				<Grid3 th={theme} />
+				<Grid container flexDirection={"row"}>
+					<Grid2 th={theme} camps={campaigns} />
+					<Grid3 th={theme} camps={campaigns} />
+				</Grid>
 			</Grid>
 			{/* The mother grid */}
 		</Box>

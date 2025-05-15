@@ -3,7 +3,7 @@
         'name' => 'zenn/pix',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'abde7bd12cca1452ecb6a430c2f7ff5f2870b83e',
+        'reference' => 'f6c89fe4aea1720cce196572d521622e8a419f6e',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'zenn/pix' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'abde7bd12cca1452ecb6a430c2f7ff5f2870b83e',
+            'reference' => 'f6c89fe4aea1720cce196572d521622e8a419f6e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

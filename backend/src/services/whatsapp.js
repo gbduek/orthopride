@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-const { client } = require("../APIs/whatsapp/wpp-client");
+const { client, getIo } = require("../APIs/whatsapp/wpp-client");
 
 // GET /messages - Get message history
 router.get("/", async (req, res) => {
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 
 // POST /send - Send a WhatsApp message
 router.post("/", async (req, res) => {
-	const { number, message } = req.body;
+	const { number, message, sent_me } = req.body;
 
 	if (!number || !message) {
 		return res
@@ -30,7 +30,20 @@ router.post("/", async (req, res) => {
 	const phone = number.replace(/\D/g, "") + "@c.us";
 
 	try {
-		await client.sendMessage(phone, message);
+		await client.sendMessage(phone, message, sent_me);
+		// Insert message into DB
+		const result = await pool.query(
+			"INSERT INTO messages (body, from_number, sent_me, received_at, to_number) VALUES ($1, $2, true, NOW(), $3) RETURNING *",
+			[message, "me", phone]
+		);
+		const savedMessage = result.rows[0];
+
+		const io = getIo();
+		if (io) {
+			io.emit("new_message", savedMessage);
+		} else {
+			console.warn("Socket.io instance not ready");
+		}
 		res.status(200).json({ success: true });
 	} catch (err) {
 		console.error("Error sending message:", err);

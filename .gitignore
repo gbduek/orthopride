@@ -3,3 +3,7 @@
 
 # Ignore node_modules in orthopride_app
 /orthopride_app/node_modules/
+
+# Ignore whatsapp cache
+/backend/src/.wwebjs_auth
+/backend/src/.wwebjs_cache

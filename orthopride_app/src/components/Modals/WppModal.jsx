@@ -7,14 +7,13 @@ import {
 	Button,
 	IconButton,
 	CircularProgress,
+	Input,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import io from "socket.io-client";
 import axios from "axios";
 import WhatsappMessage from "../../services/WhatsappMessage";
 import bgImage from "../../assets/img/wpp_BG.jpg";
-
-const socket = io("http://localhost:3001");
+import { useSocket } from "../../contexts/SocketContext";
 
 const style = {
 	position: "absolute",
@@ -31,73 +30,49 @@ const style = {
 };
 
 const WppModal = ({ open, onClose }) => {
-	const [qrCode, setQrCode] = useState(null);
-	const [status, setStatus] = useState("Waiting for QR code...");
+	const { socket, isSocketReady, isConnected, isQrLoading, qrCode, status } =
+		useSocket();
 	const [messages, setMessages] = useState([]);
 	const [messageInput, setMessageInput] = useState("");
 	const [recipient, setRecipient] = useState("");
-	const [isConnected, setIsConnected] = useState(false);
-	const [isQrLoading, setIsQrLoading] = useState(true);
 	const [selectedNumber, setSelectedNumber] = useState(null);
+	const [mediaFile, setMediaFile] = useState(null);
 
 	useEffect(() => {
+		if (!socket) return;
+
+		const handleNewMessage = (newMessage) => {
+			setMessages((prev) => [...prev, newMessage]);
+		};
+		socket.on("new_message", handleNewMessage);
+
 		if (open) {
 			const fetchMessages = async () => {
 				try {
 					const data = await WhatsappMessage();
-					setMessages(data.reverse());
+					setMessages(data);
 				} catch (error) {
 					console.error("Erro ao carregar mensagens:", error);
 				}
 			};
 			fetchMessages();
 		}
-	}, [open]);
-
-	useEffect(() => {
-		socket.on("qr", (qr) => {
-			setQrCode(qr);
-			setStatus("Scan the QR code with WhatsApp");
-			setIsQrLoading(false);
-		});
-
-		socket.on("authenticated", () => {
-			setStatus("Authenticated!");
-			setQrCode(null);
-			setIsConnected(true);
-		});
-
-		socket.on("ready", () => {
-			setStatus("WhatsApp is ready!");
-			setIsConnected(true);
-		});
-
-		socket.on("disconnected", () => {
-			setStatus("Disconnected");
-			setIsConnected(false);
-			setIsQrLoading(false);
-		});
-
-		socket.on("message", (msg) => {
-			setMessages((prev) => [msg, ...prev]);
-		});
 
 		return () => {
-			socket.off("qr");
-			socket.off("authenticated");
-			socket.off("ready");
-			socket.off("disconnected");
-			socket.off("message");
+			socket.off("new_message", handleNewMessage);
 		};
-	}, []);
+	}, [socket, open]);
 
 	const handleSend = async () => {
-		if (!recipient || !messageInput.trim()) return;
+		const numberToSend = selectedNumber || recipient;
+
+		if (!numberToSend || !messageInput.trim()) return;
 
 		try {
 			await axios.post("http://localhost:3001/whatsapp", {
-				number: recipient,
+				number: numberToSend,
 				message: messageInput,
+				sent_me: true,
 			});
 			setMessageInput("");
 		} catch (err) {
@@ -158,43 +133,47 @@ const WppModal = ({ open, onClose }) => {
 						<Box display="flex" gap={2}>
 							{/* Chat list */}
 							<Box
-								width="250px"
+								width="255px"
 								sx={{
-									maxHeight: "50vh", // Or adjust as needed
+									minWidth: "255px",
+									maxHeight: "50vh",
+									overflowY: "auto", // Or adjust as needed
 								}}
 							>
-								{chatNumbers.map((number, index) => (
-									<Box
-										key={index}
-										onClick={() =>
-											setSelectedNumber(number)
-										}
-										sx={{
-											bgcolor:
-												selectedNumber === number
-													? "#aed581"
-													: "#dcf8c6", // Highlight selected number
-											color: "#000",
-											p: 1.5,
-											boxShadow: 1,
-											borderRadius: 2,
-											mb: 1,
-											cursor: "pointer",
-											transition: "0.2s",
-										}}
-									>
-										<Typography variant="body1">
-											{number}
-										</Typography>
-									</Box>
-								))}
+								{chatNumbers
+									.filter((number) => number !== "me")
+									.map((number, index) => (
+										<Box
+											key={index}
+											onClick={() =>
+												setSelectedNumber(number)
+											}
+											sx={{
+												bgcolor:
+													selectedNumber === number
+														? "#aed581"
+														: "#dcf8c6", // Highlight selected number
+												color: "#000",
+												p: 1.5,
+												boxShadow: 1,
+												borderRadius: 2,
+												mb: 1,
+												cursor: "pointer",
+												transition: "0.2s",
+											}}
+										>
+											<Typography variant="body1">
+												{number}
+											</Typography>
+										</Box>
+									))}
 							</Box>
 
 							{/* Message panel */}
 							<Box
 								sx={{
 									display: "flex",
-									flexDirection: "column-reverse",
+									flexDirection: "column",
 									gap: 1,
 									maxHeight: "50vh",
 									minHeight: "50vh",
@@ -212,7 +191,12 @@ const WppModal = ({ open, onClose }) => {
 									<Box
 										key={index}
 										sx={{
-											bgcolor: "#fff", // Default background for messages
+											alignSelf: msg.sent_me
+												? "flex-end"
+												: "flex-start",
+											bgcolor: msg.sent_me
+												? "#dcf8c6"
+												: "#fff", // Green for sent, white for received
 											color: "#000",
 											p: 1.5,
 											borderRadius: 2,
@@ -243,7 +227,7 @@ const WppModal = ({ open, onClose }) => {
 						</Box>
 
 						{/* Input fields */}
-						<Box mt={2} display="flex" gap={1}>
+						{/* <Box mt={2} display="flex" gap={1}>
 							<TextField
 								fullWidth
 								size="small"
@@ -251,7 +235,16 @@ const WppModal = ({ open, onClose }) => {
 								value={recipient}
 								onChange={(e) => setRecipient(e.target.value)}
 							/>
-						</Box>
+						</Box> */}
+						<Input
+							type="file"
+							accept="image/*"
+							onChange={(e) => setMediaFile(e.target.files[0])}
+							inputProps={{
+								"aria-label": "Selecione um arquivo de imagem",
+								placeholder: "Selecione um arquivo",
+							}}
+						/>
 
 						<Box mt={2} display="flex" gap={1}>
 							<TextField

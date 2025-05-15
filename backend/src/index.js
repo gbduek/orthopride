@@ -23,7 +23,7 @@ app.use(express.json()); // necessário para ler JSON no corpo da requisição
 //Endpoint para gerar link e QR Code de pix
 app.get("/pix", (req, res) => {
 	// Caminho para o index.php
-	const phpFilePath = path.join(__dirname, "../APIs/zenn-pix/index.php");
+	const phpFilePath = path.join(__dirname, "./APIs/zenn-pix/index.php");
 
 	// Executa o arquivo PHP como processo
 	execFile("php", [phpFilePath], (error, stdout, stderr) => {

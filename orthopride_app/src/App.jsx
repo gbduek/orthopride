@@ -8,6 +8,7 @@ import Financeiro from "./screens/Financeiro/Financeiro.jsx";
 import Mensageria from "./screens/Mensageria.jsx";
 import Campanhas from "./screens/Campanhas/Campanhas.jsx";
 import ConfigScreen from "./screens/ConfigScreen/ConfigScreen.jsx";
+import { SocketProvider } from "./contexts/SocketContext.jsx";
 
 // Font imports
 import "@fontsource/poppins/100.css"; // Thin
@@ -24,20 +25,28 @@ function App() {
 	const { isAuth } = useAuth();
 
 	return (
-		<Routes>
-			{isAuth ? (
-				<Route path="/" element={<Layout />}>
-					<Route path="/dashboard" element={<Dashboard />} />
-					<Route path="/agendamentos" element={<Agendamentos />} />
-					<Route path="/financeiro" element={<Financeiro />} />
-					<Route path="/mensageria" element={<Mensageria />} />
-					<Route path="/campanhas" element={<Campanhas />} />
-					<Route path="/configscreen" element={<ConfigScreen />} />
-				</Route>
-			) : (
-				<Route path="*" element={<Login />} />
-			)}
-		</Routes>
+		<SocketProvider>
+			<Routes>
+				{isAuth ? (
+					<Route path="/" element={<Layout />}>
+						<Route path="/dashboard" element={<Dashboard />} />
+						<Route
+							path="/agendamentos"
+							element={<Agendamentos />}
+						/>
+						<Route path="/financeiro" element={<Financeiro />} />
+						<Route path="/mensageria" element={<Mensageria />} />
+						<Route path="/campanhas" element={<Campanhas />} />
+						<Route
+							path="/configscreen"
+							element={<ConfigScreen />}
+						/>
+					</Route>
+				) : (
+					<Route path="*" element={<Login />} />
+				)}
+			</Routes>
+		</SocketProvider>
 	);
 }
 

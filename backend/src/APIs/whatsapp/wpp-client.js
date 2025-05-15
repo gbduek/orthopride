@@ -32,18 +32,33 @@ function initWhatsapp(socketServer) {
 	});
 
 	client.on("message", async (message) => {
-		console.log(message.body);
+		console.log(
+			`[${message.fromMe ? "SENT" : "RECEIVED"}] ${message.body}`
+		);
 		try {
-			await pool.query(
-				"INSERT INTO messages (body, from_number) VALUES ($1, $2)",
-				[message.body, message.from]
-			);
+			let savedMessage;
+			if (message.fromMe) {
+				const result = await pool.query(
+					"INSERT INTO messages (body, from_number, sent_me, received_at, to_number) VALUES ($1, $2, true, NOW(), $3) RETURNING *",
+					[message.body, message.to, "me"]
+				);
+				savedMessage = result.rows[0];
+			} else {
+				const result = await pool.query(
+					"INSERT INTO messages (body, from_number, sent_me, received_at) VALUES ($1, $2, false, NOW()) RETURNING *",
+					[message.body, message.from]
+				);
+				savedMessage = result.rows[0];
+			}
+
+			// Emit to all connected clients
+			io.emit("new_message", savedMessage);
 		} catch (err) {
-			console.error("Failed to store message:", err);
+			console.error("Failed to store or emit message:", err);
 		}
 	});
 
 	client.initialize();
 }
 
-module.exports = { initWhatsapp, client };
+module.exports = { initWhatsapp, client, getIo: () => io };
