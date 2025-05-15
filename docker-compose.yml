@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./orthopride_app
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:sichagabi@db:5432/orthopride
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sichagabi
+      POSTGRES_DB: orthopride
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./orthopride_dump.sql:/docker-entrypoint-initdb.d/orthopride_dump.sql
+
+volumes:
+  pgdata:

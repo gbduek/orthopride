@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
 	Modal,
 	Box,
@@ -37,6 +37,7 @@ const WppModal = ({ open, onClose }) => {
 	const [recipient, setRecipient] = useState("");
 	const [selectedNumber, setSelectedNumber] = useState(null);
 	const [mediaFile, setMediaFile] = useState(null);
+	const messagesEndRef = useRef(null);
 
 	useEffect(() => {
 		if (!socket) return;
@@ -94,6 +95,13 @@ const WppModal = ({ open, onClose }) => {
 					msg.to_number === selectedNumber
 		  )
 		: [];
+
+	useEffect(() => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollTop =
+				messagesEndRef.current.scrollHeight;
+		}
+	}, [filteredMessages]);
 
 	return (
 		<Modal open={open} onClose={onClose}>
@@ -171,6 +179,7 @@ const WppModal = ({ open, onClose }) => {
 
 							{/* Message panel */}
 							<Box
+								ref={messagesEndRef}
 								sx={{
 									display: "flex",
 									flexDirection: "column",
