@@ -2,148 +2,118 @@ import React, { useState } from "react";
 import {
 	Box,
 	Typography,
-	TextField,
-	MenuItem,
-	Select,
-	InputLabel,
-	FormControl,
-	Button,
-	Alert,
-	Paper,
-	Grid,
+	Tabs,
+	Tab,
+	FormControlLabel,
+	Switch,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import UsersList from "./UsersList";
-import NewPixService from "../../services/NewPixService";
+import {
+	Settings as SettingsIcon,
+	Payment as PaymentIcon,
+	People as PeopleIcon,
+	Notifications as NotificationsIcon,
+	Api as ApiIcon,
+} from "@mui/icons-material";
 
-const keyTypes = [
-	{ value: "cpf", label: "CPF" },
-	{ value: "cnpj", label: "CNPJ" },
-	{ value: "email", label: "E-mail" },
-	{ value: "telefone", label: "Telefone" },
-	{ value: "aleatoria", label: "Chave Aleatória" },
-];
+// Import components
+import IntegrationsTab from "./tabs/IntegrationsTab";
+import PaymentsTab from "./tabs/PaymentsTab";
+import UsersTab from "./tabs/UsersTab";
+import NotificationsTab from "./tabs/NotificationsTab";
 
 const ConfigScreen = () => {
-	const [pixKey, setPixKey] = useState("");
-	const [keyType, setKeyType] = useState("cpf");
-	const [message, setMessage] = useState("");
-	const [error, setError] = useState(false);
+	const [activeTab, setActiveTab] = useState(0);
+	const [darkMode, setDarkMode] = useState(false);
 
-	const handlePixSubmit = async (e) => {
-		e.preventDefault();
-
-		const body = {
-			pix: pixKey,
-		};
-
-		try {
-			const created = await NewPixService(body);
-			console.log("Evento criado no backend:", created);
-		} catch (error) {
-			alert("Erro ao criar evento.");
-			console.error(error);
-		}
-
-		if (pixKey.trim() === "") {
-			setError(true);
-			setMessage("A chave PIX não pode estar vazia.");
-			return;
-		}
+	const handleTabChange = (event, newValue) => {
+		setActiveTab(newValue);
 	};
 
 	return (
-		<Box sx={{ minHeight: "100vh", p: 4 }}>
-			<Typography
-				color={"#00d2ff"}
-				fontFamily={"poppins"}
-				fontWeight={"bold"}
-				variant="h2"
-				gutterBottom
+		<Box
+			sx={{
+				minHeight: "100vh",
+				p: 4,
+				backgroundColor: darkMode ? "#121212" : "#f5f7fa",
+			}}
+		>
+			<Box
+				sx={{
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "center",
+					mb: 4,
+				}}
 			>
-				Configurações
-			</Typography>
+				<Typography
+					color={darkMode ? "#00d2ff" : "#1976d2"}
+					fontFamily={"poppins"}
+					fontWeight={"bold"}
+					variant="h3"
+					gutterBottom
+				>
+					<SettingsIcon
+						sx={{
+							verticalAlign: "middle",
+							mr: 2,
+							fontSize: "inherit",
+						}}
+					/>
+					Configurações da Plataforma
+				</Typography>
+
+				<FormControlLabel
+					control={
+						<Switch
+							checked={darkMode}
+							onChange={() => setDarkMode(!darkMode)}
+							color="primary"
+						/>
+					}
+					label="Modo Escuro"
+					sx={{ mr: 2 }}
+				/>
+			</Box>
+
+			<Tabs
+				value={activeTab}
+				onChange={handleTabChange}
+				sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+				indicatorColor="primary"
+				textColor="primary"
+			>
+				<Tab
+					label="Integrações"
+					icon={<ApiIcon />}
+					iconPosition="start"
+				/>
+				<Tab
+					label="Pagamentos"
+					icon={<PaymentIcon />}
+					iconPosition="start"
+				/>
+				<Tab
+					label="Usuários"
+					icon={<PeopleIcon />}
+					iconPosition="start"
+				/>
+				<Tab
+					label="Notificações"
+					icon={<NotificationsIcon />}
+					iconPosition="start"
+				/>
+			</Tabs>
 
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.4 }}
 			>
-				<Grid container direction={"row"} spacing={3}>
-					<Paper
-						elevation={3}
-						sx={{ width: 500, p: 4, borderRadius: 3 }}
-					>
-						<Typography variant="h6" fontWeight={600} mb={2}>
-							Integrações
-						</Typography>
-
-						<Box
-							component="form"
-							onSubmit={handlePixSubmit}
-							sx={{
-								display: "flex",
-								flexDirection: "column",
-								gap: 3,
-							}}
-						>
-							<FormControl fullWidth>
-								<InputLabel id="pix-key-type-label">
-									Tipo de Chave PIX
-								</InputLabel>
-								<Select
-									labelId="pix-key-type-label"
-									value={keyType}
-									label="Tipo de Chave PIX"
-									onChange={(e) => setKeyType(e.target.value)}
-								>
-									{keyTypes.map((type) => (
-										<MenuItem
-											key={type.value}
-											value={type.value}
-										>
-											{type.label}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-
-							<TextField
-								label="Chave PIX"
-								value={pixKey}
-								onChange={(e) => setPixKey(e.target.value)}
-								placeholder="Digite sua chave PIX"
-								fullWidth
-							/>
-
-							<Button
-								variant="contained"
-								color="primary"
-								type="submit"
-								sx={{ textTransform: "none", fontWeight: 600 }}
-							>
-								Cadastrar Chave
-							</Button>
-
-							{message && (
-								<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									transition={{ duration: 0.3 }}
-								>
-									<Alert
-										severity={error ? "error" : "success"}
-									>
-										{message}
-									</Alert>
-								</motion.div>
-							)}
-						</Box>
-					</Paper>
-					<Box sx={{ width: 600 }}>
-						<UsersList />
-					</Box>
-				</Grid>
+				{activeTab === 0 && <IntegrationsTab darkMode={darkMode} />}
+				{activeTab === 1 && <PaymentsTab darkMode={darkMode} />}
+				{activeTab === 2 && <UsersTab darkMode={darkMode} />}
+				{activeTab === 3 && <NotificationsTab darkMode={darkMode} />}
 			</motion.div>
 		</Box>
 	);
