@@ -64,7 +64,7 @@ const WppModal = ({ open, onClose }) => {
 		};
 	}, [socket, open]);
 
-	const handleSend = async () => {
+	const handleSendText = async () => {
 		const numberToSend = selectedNumber || recipient;
 
 		if (!numberToSend || !messageInput.trim()) return;
@@ -78,6 +78,43 @@ const WppModal = ({ open, onClose }) => {
 			setMessageInput("");
 		} catch (err) {
 			console.error("Failed to send message", err);
+		}
+	};
+
+	const handleSendMedia = async () => {
+		const numberToSend = selectedNumber || recipient;
+		if (!numberToSend || !mediaFile) return;
+
+		const formData = new FormData();
+		formData.append("number", numberToSend);
+		if (messageInput.trim())
+			formData.append("message", messageInput.trim());
+		formData.append("media", mediaFile);
+
+		try {
+			await axios.post(
+				"http://localhost:3001/whatsapp/send-media",
+				formData,
+				{
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+				}
+			);
+			setMessageInput("");
+			setMediaFile(null);
+		} catch (err) {
+			console.error("Failed to send media message", err);
+		} finally {
+			setMediaFile(null);
+		}
+	};
+
+	const handleSend = () => {
+		if (mediaFile) {
+			handleSendMedia();
+		} else {
+			handleSendText();
 		}
 	};
 
@@ -205,7 +242,7 @@ const WppModal = ({ open, onClose }) => {
 												: "flex-start",
 											bgcolor: msg.sent_me
 												? "#dcf8c6"
-												: "#fff", // Green for sent, white for received
+												: "#fff",
 											color: "#000",
 											p: 1.5,
 											borderRadius: 2,
@@ -213,18 +250,67 @@ const WppModal = ({ open, onClose }) => {
 											boxShadow: 1,
 										}}
 									>
-										<Typography variant="body1">
-											{msg.from_number}{" "}
-											{/* Display number or name */}
+										<Typography
+											variant="body1"
+											sx={{ fontWeight: "bold" }}
+										>
+											{msg.from_number}
 										</Typography>
-										<Typography variant="body2">
-											{msg.body}
-										</Typography>
+
+										{msg.media_url ? (
+											msg.media_type?.startsWith(
+												"image"
+											) ? (
+												<img
+													src={`http://localhost:3001/${msg.media_url.replace(
+														"./",
+														""
+													)}`}
+													alt="media"
+													style={{
+														maxWidth: "200px",
+														borderRadius: "8px",
+													}}
+													loading="lazy"
+												/>
+											) : msg.media_type?.startsWith(
+													"video"
+											  ) ? (
+												<video
+													controls
+													style={{
+														maxWidth: "200px",
+														borderRadius: "8px",
+													}}
+												>
+													<source
+														src={msg.media_url}
+														type={msg.media_type}
+													/>
+													Your browser does not
+													support the video tag.
+												</video>
+											) : (
+												<a
+													href={msg.media_url}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													Download File
+												</a>
+											)
+										) : (
+											<Typography variant="body2">
+												{msg.body}
+											</Typography>
+										)}
+
 										<Typography
 											variant="caption"
 											color="text.secondary"
 											align="right"
 											display="block"
+											sx={{ mt: 0.5 }}
 										>
 											{new Date(
 												msg.received_at || Date.now()
@@ -249,10 +335,6 @@ const WppModal = ({ open, onClose }) => {
 							type="file"
 							accept="image/*"
 							onChange={(e) => setMediaFile(e.target.files[0])}
-							inputProps={{
-								"aria-label": "Selecione um arquivo de imagem",
-								placeholder: "Selecione um arquivo",
-							}}
 						/>
 
 						<Box mt={2} display="flex" gap={1}>

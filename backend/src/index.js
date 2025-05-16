@@ -22,11 +22,14 @@ app.use(express.json()); // necessário para ler JSON no corpo da requisição
 
 //Endpoint para gerar link e QR Code de pix
 app.get("/pix", (req, res) => {
+	// Get the amount from query parameters
+	const amount = req.query.amount || "0.00";
+
 	// Caminho para o index.php
 	const phpFilePath = path.join(__dirname, "./APIs/zenn-pix/index.php");
 
 	// Executa o arquivo PHP como processo
-	execFile("php", [phpFilePath], (error, stdout, stderr) => {
+	execFile("php", [phpFilePath, amount], (error, stdout, stderr) => {
 		if (error) {
 			console.error("Erro ao executar o PHP:", stderr);
 			return res
@@ -82,6 +85,7 @@ app.use("/cadastraPix", cadastraPixRouter);
 //whatsapp-web.js
 initWhatsapp(server); // Pass explicit server to whatsapp-web.js socket handler
 app.use("/whatsapp", whatsappRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Inicia o servidor
 server.listen(PORT, () => {

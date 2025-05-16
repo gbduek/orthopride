@@ -1,34 +1,69 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  frontend:
-    build: ./orthopride_app
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        container_name: nginx-proxy
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+            - ./certs:/etc/nginx/certs
+            - ./vhost.d:/etc/nginx/vhost.d
+            - ./html:/usr/share/nginx/html
+            - ./data:/etc/nginx/conf.d
 
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:sichagabi@db:5432/orthopride
-    depends_on:
-      - db
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        container_name: nginx-letsencrypt
+        restart: always
+        environment:
+            NGINX_PROXY_CONTAINER: nginx-proxy
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./certs:/etc/nginx/certs:rw
+            - ./vhost.d:/etc/nginx/vhost.d
+            - ./html:/usr/share/nginx/html
+            - ./data:/etc/nginx/conf.d
 
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: sichagabi
-      POSTGRES_DB: orthopride
-    ports:
-      - "5433:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./orthopride_dump.sql:/docker-entrypoint-initdb.d/orthopride_dump.sql
+    frontend:
+        build: ./orthopride_app
+        expose:
+            - "80"
+        environment:
+            - VIRTUAL_HOST=orthopride.zenn.digital
+            - LETSENCRYPT_HOST=orthopride.zenn.digital
+            - LETSENCRYPT_EMAIL=your@email.com
+        depends_on:
+            - backend
+
+    backend:
+        build: ./backend
+        expose:
+            - "5000"
+        environment:
+            - DATABASE_URL=postgresql://postgres:sichagabi@db:5432/orthopride
+            - VIRTUAL_HOST=orthoprideapi.zenn.digital
+            - VIRTUAL_PORT=5000
+            - LETSENCRYPT_HOST=orthoprideapi.zenn.digital
+            - LETSENCRYPT_EMAIL=your@email.com
+        depends_on:
+            - db
+
+    db:
+        image: postgres:15
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: sichagabi
+            POSTGRES_DB: orthopride
+        ports:
+            - "5433:5432"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+            - db/orthopride_dump.sql:/docker-entrypoint-initdb.d/orthopride_dump.sql
 
 volumes:
-  pgdata:
+    pgdata:

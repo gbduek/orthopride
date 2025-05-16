@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
 	Modal,
 	Box,
@@ -10,6 +10,7 @@ import {
 	RadioGroup,
 	FormControlLabel,
 	Radio,
+	TextField,
 } from "@mui/material";
 import PixIcon from "../../assets/icons/PixIcon";
 import BoletoIcon from "../../assets/icons/BoletoIcon";
@@ -25,18 +26,20 @@ const style = {
 	borderRadius: 2,
 	boxShadow: 24,
 	p: 4,
+	overflowY: "auto",
 };
 
 const PaymentModal = ({ isOpen = false, onClose }) => {
 	const [patientName, setPatientName] = useState("");
 	const [eventType, setEventType] = useState("consulta");
+	const [amount, setAmount] = useState("");
 	const [qrCodeBase64, setQrCodeBase64] = useState(null);
 	const [pixPayload, setPixPayload] = useState("");
 
 	const handleSubmit = async () => {
 		if (eventType === "pix") {
 			try {
-				const { payload, qrcode_base64 } = await PixService();
+				const { payload, qrcode_base64 } = await PixService(amount);
 				setQrCodeBase64(qrcode_base64);
 				setPixPayload(payload);
 			} catch (error) {
@@ -51,6 +54,7 @@ const PaymentModal = ({ isOpen = false, onClose }) => {
 		// Limpa tudo ao fechar
 		setQrCodeBase64(null);
 		setPixPayload("");
+		setAmount("");
 		setPatientName("");
 		setEventType("consulta");
 		onClose();
@@ -58,13 +62,24 @@ const PaymentModal = ({ isOpen = false, onClose }) => {
 
 	return (
 		<Modal open={isOpen} onClose={handleClose}>
-			<Box sx={style}>
+			<Box sx={style} maxHeight={500}>
 				<FormControl fullWidth margin="normal">
 					<FormLabel>Nome do Cliente</FormLabel>
 					<Input
 						value={patientName}
 						onChange={(e) => setPatientName(e.target.value)}
 						fullWidth
+					/>
+				</FormControl>
+
+				<FormControl fullWidth margin="normal">
+					<FormLabel>Valor (R$)</FormLabel>
+					<TextField
+						type="number"
+						value={amount}
+						onChange={(e) => setAmount(e.target.value)}
+						fullWidth
+						inputProps={{ step: "0.01", min: "0.01" }}
 					/>
 				</FormControl>
 

@@ -9,6 +9,15 @@ use Mpdf\QrCode\Output;
 // Define o header como JSON
 header('Content-Type: application/json');
 
+// Get the amount from command line arguments
+$amount = isset($argv[1]) ? (float)$argv[1] : 5.00;
+
+// Validate amount
+if ($amount <= 0) {
+    echo json_encode(['error' => 'O valor deve ser maior que zero']);
+    exit;
+}
+
 // Configuração da conexão com o banco de dados PostgreSQL
 $host = 'localhost';
 $port = '5433';
@@ -36,7 +45,7 @@ try {
         ->setDescription('Pagamento do pedido 123456')
         ->setMerchantName('Orthopride')
         ->setMerchantCity('RIO DE JANEIRO')
-        ->setAmount(5.00)
+        ->setAmount($amount)
         ->setTxid('ZENN1234');
 
     // Gera o payload em string
