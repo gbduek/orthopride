@@ -1,135 +1,190 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Button, Input, Grid } from "@mui/material";
-import FinanceResume from "./FinanceResume";
-import FinanceForm from "./FinanceForm";
+import {
+	Container,
+	Typography,
+	Box,
+	Button,
+	Grid,
+	Tabs,
+	Tab,
+	Paper,
+	Divider,
+} from "@mui/material";
+import {
+	Upload as UploadIcon,
+	Add as AddIcon,
+	Receipt as ReceiptIcon,
+	PieChart as PieChartIcon,
+	ListAlt as ListAltIcon,
+} from "@mui/icons-material";
+import { motion } from "framer-motion";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import FinanceSummary from "./components/FinanceSummary";
+import TransactionForm from "./components/TransactionForm";
+import TransactionTable from "./components/TransactionTable";
 import PaymentModal from "../../components/Modals/PaymentModal";
+import FinanceChart from "./components/FinanceChart";
 
 const FinanceScreen = () => {
-	const [transactionsList, setTransactionsList] = useState([]);
-	const [income, setIncome] = useState(0);
-	const [expense, setExpense] = useState(0);
-	const [total, setTotal] = useState(0);
+	const [transactions, setTransactions] = useState([]);
+	const [summary, setSummary] = useState({
+		income: 0,
+		expense: 0,
+		balance: 0,
+	});
 	const [pdfFile, setPdfFile] = useState(null);
 	const [openModal, setOpenModal] = useState(false);
+	const [activeTab, setActiveTab] = useState(0);
 
-	const handleOpenModal = () => {
-		setOpenModal(true);
-	};
-
-	const handleCloseModal = () => {
-		setOpenModal(false);
-	};
+	const handleOpenModal = () => setOpenModal(true);
+	const handleCloseModal = () => setOpenModal(false);
+	const handleTabChange = (event, newValue) => setActiveTab(newValue);
 
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
-		if (file) {
-			setPdfFile(file);
-		}
+		if (file) setPdfFile(file);
 	};
 
 	useEffect(() => {
-		const amountExpense = transactionsList
-			.filter((item) => item.expense)
-			.map((transaction) => Number(transaction.amount));
+		const expenses = transactions
+			.filter((t) => t.expense)
+			.reduce((sum, t) => sum + Number(t.amount), 0);
 
-		const amountIncome = transactionsList
-			.filter((item) => !item.expense)
-			.map((transaction) => Number(transaction.amount));
+		const income = transactions
+			.filter((t) => !t.expense)
+			.reduce((sum, t) => sum + Number(t.amount), 0);
 
-		const totalExpense = amountExpense.reduce((acc, cur) => acc + cur, 0);
-		const totalIncome = amountIncome.reduce((acc, cur) => acc + cur, 0);
+		setSummary({
+			income: income.toFixed(2),
+			expense: expenses.toFixed(2),
+			balance: (income - expenses).toFixed(2),
+		});
+	}, [transactions]);
 
-		const formattedExpense = totalExpense.toFixed(2);
-		const formattedIncome = totalIncome.toFixed(2);
-		const formattedTotal = Math.abs(totalIncome - totalExpense).toFixed(2);
+	const addTransaction = (transaction) => {
+		setTransactions([
+			...transactions,
+			{
+				...transaction,
+				id: Date.now(),
+				date: new Date().toISOString().split("T")[0],
+			},
+		]);
+	};
 
-		setIncome(`R$ ${formattedIncome}`);
-		setExpense(`R$ ${formattedExpense}`);
-		setTotal(
-			`${totalIncome < totalExpense ? "-" : ""}R$ ${formattedTotal}`
-		);
-	}, [transactionsList]);
-
-	const handleAdd = (transaction) => {
-		const newArrayTransactions = [...transactionsList, transaction];
-		setTransactionsList(newArrayTransactions);
+	const deleteTransaction = (id) => {
+		setTransactions(transactions.filter((t) => t.id !== id));
 	};
 
 	return (
-		<Container>
-			{openModal ? (
-				<PaymentModal isOpen={true} onClose={handleCloseModal} />
-			) : null}
-			<Box sx={{ mt: 2 }}>
-				<Typography
-					variant="h2"
-					component="h1"
-					sx={{
-						marginTop: "40px",
-						marginBottom: "40px",
-						backgroundImage:
-							"linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%)",
-						WebkitBackgroundClip: "text",
-						WebkitTextFillColor: "transparent",
-						fontWeight: "bold",
-					}}
-					fontFamily={"poppins"}
-					fontWeight={"bold"}
-					gutterBottom
+		<LocalizationProvider dateAdapter={AdapterDateFns}>
+			<Container maxWidth="xl" sx={{ py: 4 }}>
+				{openModal ? (
+					<PaymentModal isOpen={true} onClose={handleCloseModal} />
+				) : null}
+				<Box sx={{ mb: 4 }}>
+					<Typography
+						variant="h3"
+						component="h1"
+						sx={{
+							fontWeight: 700,
+							color: "primary.main",
+							display: "flex",
+							alignItems: "center",
+							gap: 2,
+						}}
+					>
+						<ReceiptIcon fontSize="large" />
+						Controle Financeiro
+					</Typography>
+					<Typography variant="subtitle1" color="text.secondary">
+						Gerencie suas transações e visualize seu fluxo
+						financeiro
+					</Typography>
+				</Box>
+
+				<Tabs
+					value={activeTab}
+					onChange={handleTabChange}
+					sx={{ mb: 3 }}
+					variant="fullWidth"
 				>
-					Controle Financeiro
-				</Typography>
-				<Grid container direction={"row"} spacing={2}>
-					<Button
-						variant="contained"
-						component="label"
-						sx={{
-							mb: 2,
-							transition: "0.3s",
-							"&:hover": {
-								backgroundColor: "#316dbf",
-							},
-							backgroundColor: "#3a7bd5",
-						}}
-					>
-						Importar Planilha
-						<Input
-							type="file"
-							accept=".csv"
-							onChange={handleFileChange}
-							sx={{ display: "none" }}
+					<Tab label="Visão Geral" icon={<PieChartIcon />} />
+					<Tab label="Transações" icon={<ListAltIcon />} />
+				</Tabs>
+
+				{activeTab === 0 && (
+					<>
+						<FinanceSummary
+							income={summary.income}
+							expense={summary.expense}
+							balance={summary.balance}
 						/>
-					</Button>
-					<Button
-						onClick={handleOpenModal}
-						variant="contained"
-						component="label"
-						sx={{
-							mb: 2,
-							transition: "0.3s",
-							"&:hover": {
-								backgroundColor: "#316dbf",
-							},
-							backgroundColor: "#3a7bd5",
-						}}
-					>
-						+ Novo Pagamento
-					</Button>
-				</Grid>
-				<FinanceResume
-					income={income}
-					expense={expense}
-					total={total}
-				/>
-			</Box>
-			<Box sx={{ mt: 2 }}>
-				<FinanceForm
-					handleAdd={handleAdd}
-					transactionsList={transactionsList}
-					setTransactionsList={setTransactionsList}
-				/>
-			</Box>
-		</Container>
+
+						<Box sx={{ mt: 4 }}>
+							<FinanceChart transactions={transactions} />
+						</Box>
+					</>
+				)}
+
+				{activeTab === 1 && (
+					<Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+						<Box
+							sx={{
+								display: "flex",
+								justifyContent: "space-between",
+								alignItems: "center",
+								mb: 3,
+							}}
+						>
+							<Typography variant="h6" fontWeight={600}>
+								Gestão de Transações
+							</Typography>
+
+							<Box>
+								<Button
+									variant="contained"
+									component="label"
+									startIcon={<UploadIcon />}
+									sx={{ mr: 2 }}
+								>
+									Importar
+									<input
+										type="file"
+										accept=".csv,.pdf"
+										hidden
+										onChange={handleFileChange}
+									/>
+								</Button>
+
+								<Button
+									variant="contained"
+									color="secondary"
+									startIcon={<AddIcon />}
+									onClick={handleOpenModal}
+								>
+									Novo Pagamento
+								</Button>
+							</Box>
+						</Box>
+
+						<Divider sx={{ my: 2 }} />
+
+						<TransactionForm onAddTransaction={addTransaction} />
+
+						<Box sx={{ mt: 4 }}>
+							<TransactionTable
+								transactions={transactions}
+								onDelete={deleteTransaction}
+							/>
+						</Box>
+					</Paper>
+				)}
+
+				<PaymentModal open={openModal} onClose={handleCloseModal} />
+			</Container>
+		</LocalizationProvider>
 	);
 };
 
