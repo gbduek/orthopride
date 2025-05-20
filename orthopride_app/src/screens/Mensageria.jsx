@@ -13,7 +13,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { styled } from "@mui/system";
 import MessageModal from "../components/Modals/MessageModal";
-import WppModal from "../components/Modals/WppModal";
+import WppModal from "../components/Modals/WppModal/WppModal";
 
 const platforms = [
 	{
