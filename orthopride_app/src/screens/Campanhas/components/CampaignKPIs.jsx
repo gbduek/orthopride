@@ -44,7 +44,7 @@ const CampaignKPIs = ({ theme }) => {
 	return (
 		<Grid container spacing={3}>
 			{kpis.map((kpi, index) => (
-				<Grid item xs={12} sm={6} md={3} key={index}>
+				<Grid item size={{ xs: 12, sm: 6, md: 3 }} key={index}>
 					<KpiCard
 						sx={{
 							borderTop: `4px solid ${kpi.color}`,

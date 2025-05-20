@@ -8,10 +8,12 @@ import {
 	Box,
 	CircularProgress,
 	Alert,
+	Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CampaignPost from "../../../services/CampaignPost";
 import axios from "axios";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const CreatorContainer = styled(Paper)(({ theme }) => ({
 	padding: theme.spacing(3),
@@ -87,6 +89,16 @@ const CampaignCreator = ({ theme, campaigns }) => {
 		}
 	};
 
+	const handleDownloadTemplate = () => {
+		// Create a temporary anchor element
+		const link = document.createElement("a");
+		link.href = "/template_contatos.csv";
+		link.download = "whatsapp_contacts_template.csv";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
 	return (
 		<CreatorContainer
 			sx={{
@@ -109,7 +121,7 @@ const CampaignCreator = ({ theme, campaigns }) => {
 				</Alert>
 			)}
 
-			<Box sx={{ mb: 3 }}>
+			<Stack direction="row" spacing={2} sx={{ mb: 3 }}>
 				<Button
 					variant="contained"
 					component="label"
@@ -129,14 +141,23 @@ const CampaignCreator = ({ theme, campaigns }) => {
 						hidden
 					/>
 				</Button>
-				<Typography
-					variant="caption"
-					display="block"
-					color="text.secondary"
+				<Button
+					variant="outlined"
+					startIcon={<FileDownloadIcon />}
+					onClick={handleDownloadTemplate}
 				>
-					Formatos suportados: CSV
-				</Typography>
-			</Box>
+					Baixar Modelo
+				</Button>
+			</Stack>
+
+			<Typography
+				variant="caption"
+				display="block"
+				color="text.secondary"
+				sx={{ mb: 2 }}
+			>
+				Formatos suportados: CSV (nome, email, telefone)
+			</Typography>
 
 			<TextField
 				label="Mensagem da Campanha"

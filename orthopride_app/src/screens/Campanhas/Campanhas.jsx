@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Grid, Typography, Box, CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CampaignKPIs from "./components/CampaignKPIs";
@@ -6,6 +6,7 @@ import CampaignContacts from "./components/CampaignContacts";
 import CampaignCreator from "./components/CampaignCreator";
 import GetCampaigns from "../../services/GetCampaigns";
 import { motion } from "framer-motion";
+import CampaignIcon from "@mui/icons-material/Campaign";
 
 const Campanhas = () => {
 	const theme = useTheme();
@@ -38,16 +39,26 @@ const Campanhas = () => {
 				animate={{ opacity: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<Typography
-					color={"primary.main"}
-					fontFamily={"poppins"}
-					fontWeight={"bold"}
-					variant="h3"
-					gutterBottom
-					sx={{ mb: 4 }}
-				>
-					Campanhas
-				</Typography>
+				<Box display="flex" sx={{ mb: 4 }}>
+					<CampaignIcon
+						sx={{
+							color: "primary.main",
+							marginTop: 1.5,
+							marginRight: 1,
+						}}
+						fontSize="large"
+					/>
+					<Typography
+						color={"primary.main"}
+						fontFamily={"poppins"}
+						fontWeight={"bold"}
+						variant="h3"
+						gutterBottom
+						sx={{ mb: 4 }}
+					>
+						Campanhas
+					</Typography>
+				</Box>
 
 				{isLoading ? (
 					<Box display="flex" justifyContent="center" py={10}>
@@ -59,19 +70,19 @@ const Campanhas = () => {
 					</Typography>
 				) : (
 					<Grid container spacing={4}>
-						<Grid item xs={12}>
+						<Grid item size={{ xs: 12 }}>
 							<CampaignKPIs theme={theme} />
 						</Grid>
 
 						<Grid item container spacing={4}>
-							<Grid item xs={12} md={5}>
+							<Grid item size={{ xs: 12, md: 5 }}>
 								<CampaignContacts
 									theme={theme}
 									campaigns={campaigns}
 								/>
 							</Grid>
 
-							<Grid item xs={12} md={7}>
+							<Grid item size={{ xs: 12, md: 7 }}>
 								<CampaignCreator
 									theme={theme}
 									campaigns={campaigns}
